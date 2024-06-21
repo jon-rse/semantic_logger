@@ -56,20 +56,18 @@ module SemanticLogger
       def call(log, logger)
         hash = super(log, logger)
 
-        message = {
-          message:    hash[:message].to_s,
-          tags:       hash[:tags] || [],
-          named_tags: hash[:named_tags] || {},
-
-          **hash.slice(:metric, :metric_amount, :environment, :application, :payload)
-        }
-
-        message.merge!(duration: hash[:duration_ms]) if hash.key?(:duration_ms)
-        message.merge!(duration_human: hash[:duration]) if hash.key?(:duration)
-
         result = {
           **new_relic_metadata,
-          message:       message.to_json,
+          application:    hash[:application],
+          duration:       hash[:duration_ms],
+          duration_human: hash[:duration],
+          environment:   hash[:environment],
+          metric:        hash[:metric],
+          metric_amount: hash[:metric_amount],
+          named_tags:    hash[:named_tags] || {},
+          message:       hash[:message].to_s,
+          payload:       hash[:payload],
+          tags:          hash[:tags] || [],
           timestamp:     hash[:timestamp].to_i,
           "log.level":   log.level.to_s.upcase,
           "logger.name": log.name,
